@@ -73,7 +73,7 @@ public class ChatClientImplementation implements ChatClient
     {
       if (reader.readLine().equals("done"))
       {
-        System.out.println(messageJson);
+        System.out.println();
       }
     }
     catch (IOException e)
