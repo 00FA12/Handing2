@@ -52,22 +52,19 @@ public class ChatCommunicator implements Runnable
             if (message != null)
             {
               writer.println("done");
+              broadcaster.broadcast(message);
             }
           }
           case "login" ->
           {
             String login = reader.readLine();
             Login login1 = gson.fromJson(login, Login.class);
-            for (Login user : users)
+            if (!users.contains(login1))
             {
-              if (login1.equals(user))
-              {
-                writer.println("loginSuccessful");
-                break;
-              }
-            }
             users.add(login1);
             writer.println("registrationSuccessful");
+            }
+            writer.println("loginSuccessful");
           }
           case "close" ->
           {
