@@ -1,61 +1,84 @@
 package com.example.handing2.Client;
 
+import com.example.handing2.model.Chat;
+import com.example.handing2.model.Login;
+
 import java.io.IOException;
-import java.net.*;
-import java.nio.channels.AsynchronousCloseException;
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
-public class MessageListener implements Runnable
+import com.example.handing2.model.ModelManager;
+import dk.via.remote.observer.RemotePropertyChangeEvent;
+import dk.via.remote.observer.RemotePropertyChangeListener;
+
+public class MessageListener extends UnicastRemoteObject implements RemotePropertyChangeListener<Chat>, Serializable, ChatClient
 {
-  private final ChatClientImplementation client;
-  private final MulticastSocket multicastSocket;
-  private final InetSocketAddress socketAddress;
-  private final NetworkInterface networkInterface;
-  public MessageListener(ChatClientImplementation client, String groupAddress, int port) throws IOException
+private ModelManager modelManager;
+private ChatClient chatClient;
+  public MessageListener(ChatClient chatClient, ModelManager model) throws IOException
   {
-    this.client = client;
-    multicastSocket = new MulticastSocket(port);
-    InetAddress group = InetAddress.getByName(groupAddress);
-    socketAddress = new InetSocketAddress(group, port);
-    networkInterface = NetworkInterface.getByInetAddress(group);
+    this.chatClient = chatClient;
+    this.modelManager =model;
   }
 
-  @Override public void run()
+  @Override public void send(String message) throws RemoteException
   {
-    try
-    {
-      listen();
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace();
-    }
+    chatClient.send(message);
   }
 
-  public void listen() throws IOException
+  @Override public void addPropertyChangeListener(RemotePropertyChangeListener<Chat> listener) throws RemoteException
   {
-    multicastSocket.joinGroup(socketAddress, networkInterface);
-    try
+    chatClient.addPropertyChangeListener(listener);
+  }
+
+  @Override public void removePropertyChangeListener(RemotePropertyChangeListener<Chat> listener) throws RemoteException
+  {
+    chatClient.removePropertyChangeListener(listener);
+  }
+
+  @Override public void firePropertyChange(String propertyName, Chat oldValue, Chat newValue) throws RemoteException
+  {
+    chatClient.firePropertyChange(propertyName, oldValue, newValue);
+  }
+
+  public void close() throws RemoteException, IOException
+  {
+
+  }
+
+  @Override public boolean login(Login user) throws RemoteException, IOException
+  {
+    return chatClient.login(user);
+  }
+
+  @Override public boolean register(Login user) throws RemoteException, IOException
+  {
+    return chatClient.register(user);
+  }
+
+  @Override public int getUserListSize() throws RemoteException, IOException
+  {
+    return chatClient.getUserListSize();
+  }
+
+  @Override public void propertyChange(RemotePropertyChangeEvent<Chat> remotePropertyChangeEvent)
+      throws RemoteException
+  {
+    Chat chat = remotePropertyChangeEvent.getNewValue();
+    getChat().getUsers().clear();
+    getChat().getUsers().addAll(chat.getUsers());
+    getChat().getMessages().clear();
+    getChat().getMessages().addAll(chat.getMessages());
+    if(remotePropertyChangeEvent.getPropertyName().equals("new message"))
     {
-      byte[] content = new byte[32768];
-      while (true)
-      {
-        DatagramPacket packet = new DatagramPacket(content, content.length);
-        multicastSocket.receive(packet);
-        String message = new String(packet.getData(), 0, packet.getLength());
-        client.receiveBroadCast(message);
-      }
-    }
-    catch (SocketException e)
-    {
-      if (!(e.getCause() instanceof AsynchronousCloseException))
-      {
-        throw e;
-      }
+      var messages = remotePropertyChangeEvent.getNewValue().getMessages();
+      System.out.println("New message: " + messages.get(messages.size() - 1));
+//      modelManager.sendOthersMessage(messages.get(messages.size() - 1));
     }
   }
-  public void close() throws IOException
+  public Chat getChat() throws RemoteException
   {
-    multicastSocket.leaveGroup(socketAddress, networkInterface);
-    multicastSocket.close();
+    return chatClient.getChat();
   }
 }

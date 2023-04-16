@@ -1,16 +1,22 @@
 package com.example.handing2.Client;
 
+import com.example.handing2.model.ChatModelManager;
+import com.example.handing2.model.Login;
+import com.example.handing2.model.ModelManager;
+import com.example.handing2.view.ViewHandler;
+import com.example.handing2.viewmodel.ViewModelFactory;
+import javafx.application.Application;
+import javafx.stage.Stage;
+
 import java.io.IOException;
 
-public class StartClient2
+public class StartClient2 extends Application
 {
-  public static void main(String[] args) throws IOException, InterruptedException
+  @Override public void start(Stage primaryStage) throws Exception
   {
-    ChatClient client = new ChatClientImplementation("localhost", 8080, "230.0.0.0", 8888);
-    client.addPropertyChangeListener(evt -> System.out.println(evt.getNewValue()));
-    client.login("test1", "test2");
-    client.send("test2");
-    Thread.sleep(10_000);
-    client.close();
+    ModelManager model = new ChatModelManager();
+    ViewModelFactory viewModelFactory = new ViewModelFactory(model);
+    ViewHandler viewHandler = new ViewHandler(viewModelFactory);
+    viewHandler.start(primaryStage);
   }
 }

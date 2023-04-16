@@ -1,6 +1,8 @@
 package com.example.handing2.model;
 
-public class Login
+import java.io.Serializable;
+
+public class Login implements Serializable
 {
   private final String username;
   private final String password;

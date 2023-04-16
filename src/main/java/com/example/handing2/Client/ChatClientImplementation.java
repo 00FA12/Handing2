@@ -2,107 +2,97 @@ package com.example.handing2.Client;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.*;
-import java.net.Socket;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.ArrayList;
 
+import com.example.handing2.model.Chat;
 import com.example.handing2.model.Login;
 import com.example.handing2.model.Message;
+
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import dk.via.remote.observer.RemotePropertyChangeListener;
+import dk.via.remote.observer.RemotePropertyChangeSupport;
 
-public class ChatClientImplementation implements ChatClient
-{
-  private final Socket socket;
-  private final PrintWriter writer;
-  private final BufferedReader reader;
-  private final Gson gson;
-  private final PropertyChangeSupport support;
-  private final MessageListener listener;
-  private static Login login;
-  public ChatClientImplementation(String host, int port, String groupAddress, int groupPort) throws IOException
-  {
-    socket = new Socket(host, port);
-    writer = new PrintWriter(socket.getOutputStream(), true);
-    InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
-    reader = new BufferedReader(inputStreamReader);
-    gson = new Gson();
-    support = new PropertyChangeSupport(this);
-    listener = new MessageListener(this, groupAddress, groupPort);
-    Thread thread = new Thread(listener);
-    thread.start();
+public class ChatClientImplementation implements ChatClient {
+
+private final RemotePropertyChangeSupport<Chat> support;
+private final Chat chat;
+private static Login login;
+
+  public ChatClientImplementation(Chat chat) throws RemoteException, IOException {
+    this.support = new RemotePropertyChangeSupport<>();
+    this.chat = chat;
   }
 
-  @Override public void login(String username, String password)
+  @Override
+  public boolean login(Login user) throws RemoteException, IOException
   {
-    writer.println("login");
-    login = new Login(username, password);
-    String loginJson = gson.toJson(login);
-    writer.println(loginJson);
-    try
+    if (chat.getUsers().contains(user))
     {
-      if (reader.readLine().equals("loginSuccessful") || reader.readLine().equals("registrationSuccessful"))
-      {
-        System.out.println(loginJson);
-      }
+      login = user;
+      support.firePropertyChange("list of messages", null, chat);
+      return true;
     }
-    catch (IOException e)
+    else
     {
-      throw new RuntimeException(e);
+      throw new IOException("Username or Password are incorrect");
     }
   }
 
-
-  @Override public void send(String message)
-  {
-    String messageJson = "";
-    writer.println("send");
-    try
+  @Override
+  public boolean register(Login user) throws RemoteException, IOException {
+    if (!chat.getUsers().contains(user))
     {
-      if (reader.readLine().equals("giveMe"))
-      {
-        writer.println("toma");
-        messageJson = gson.toJson(new Message(login, message));
-        writer.println(messageJson);
-      }
+      login = user;
+      support.firePropertyChange("list of messages", null, chat);
+      return true;
     }
-    catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-
-    try
-    {
-      if (reader.readLine().equals("done"))
-      {
-        System.out.println();
-      }
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace();
-    }
+    else throw new IOException("User has already been registered");
   }
 
-  @Override public void addPropertyChangeListener(
-      PropertyChangeListener listener)
+  @Override
+  public int getUserListSize() throws RemoteException, IOException {
+    return chat.getUsers().size();
+  }
+
+  @Override public Chat getChat() throws RemoteException
+  {
+    return chat;
+  }
+
+  @Override
+  public void send(String message) throws RemoteException
+  {
+    Message message1 = new Message(login, message);
+    chat.addMessage(message1);
+    support.firePropertyChange("new message", null, chat);
+  }
+
+  @Override public void addPropertyChangeListener(RemotePropertyChangeListener<Chat> listener) throws RemoteException
   {
     support.addPropertyChangeListener(listener);
   }
 
-  @Override public void removePropertyChangeListener(
-      PropertyChangeListener listener)
+  @Override public void removePropertyChangeListener(RemotePropertyChangeListener<Chat> listener) throws RemoteException
   {
     support.removePropertyChangeListener(listener);
   }
 
-  @Override public void close() throws IOException
+  @Override public void firePropertyChange(String propertyName, Chat oldValue, Chat newValue) throws RemoteException
   {
-    writer.println("close");
-    socket.close();
+    support.firePropertyChange(propertyName, oldValue, newValue);
   }
 
-  public void receiveBroadCast(String message) throws IOException
-  {
-//    String realMessage = reader.readLine();
-    support.firePropertyChange("newMessage", null, message);
-  }
+  @Override
+  public void close() throws RemoteException, IOException {}
+
+//  public void receiveBroadCast(String message) throws IOException {
+//    ArrayList<Message> realMessage = gson.fromJson(message, Message.class);
+//    System.out.println(realMessage);
+//    support.firePropertyChange("receive message", null, realMessage);
+//  }
 }

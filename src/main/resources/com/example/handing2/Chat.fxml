@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.handing2.view.ChatController">
+   <children>
+      <ListView fx:id="messageListView" editable="true" layoutX="8.0" layoutY="21.0" prefHeight="242.0" prefWidth="582.0" />
+      <Button layoutX="523.0" layoutY="302.0" mnemonicParsing="false" onAction="#onSend" prefHeight="41.0" prefWidth="62.0" text="Send" />
+      <TextArea fx:id="text" layoutX="100.0" layoutY="287.0" prefHeight="71.0" prefWidth="400.0" />
+      <Button layoutX="20.0" layoutY="302.0" mnemonicParsing="false" onAction="#onInfo" prefHeight="41.0" prefWidth="62.0" text="Info" />
+   </children>
+</AnchorPane>
