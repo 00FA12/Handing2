@@ -76,7 +76,7 @@ private ChatClient chatClient;
     {
       var messages1 = remotePropertyChangeEvent.getNewValue();
       System.out.println("New message: " + messages1.get(messages.size() - 1));
-//      modelManager.sendOthersMessage(messages.get(messages.size() - 1));
+//     modelManager.sendOthersMessage(messages.get(messages.size() - 1));
     }
   }
   public Chat getChat() throws RemoteException

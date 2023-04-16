@@ -8,10 +8,11 @@ import dk.via.remote.observer.RemotePropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class ChatModelManager implements ModelManager
+public class ChatModelManager implements ModelManager, Serializable
 {
   private Client server;
   private Chat chat;
@@ -29,18 +30,18 @@ public class ChatModelManager implements ModelManager
       if(event.getPropertyName().equals("list of messages"))
       {
         ArrayList<Message> messages = (ArrayList<Message>) event.getNewValue();
-        for (Message mes: messages)
+        for (int i = 0; i < messages.size(); i++)
         {
-          support.firePropertyChange("receive message", null, mes);
+          support.firePropertyChange("receive message", null, messages.get(i));
         }
       }
-//      else
-//      {
-//        if (!((ArrayList<Message>) event.getNewValue()).ge)
-//        {
-//          support.firePropertyChange("receive message", null, event.getNewValue());
-//        }
-//      }
+      else
+      {
+        if (!((ArrayList<Message>) event.getNewValue()).get(event.getNewValue().size()).getLogin().equals(login))
+        {
+          support.firePropertyChange("receive message", null, event.getNewValue());
+        }
+      }
     });
   }
 

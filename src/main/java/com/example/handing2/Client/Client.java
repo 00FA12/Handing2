@@ -5,21 +5,24 @@ import com.example.handing2.model.ChatModelManager;
 import com.example.handing2.model.Login;
 import com.example.handing2.model.Message;
 import dk.via.remote.observer.RemotePropertyChangeListener;
-
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.io.Serializable;
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
 
-public class Client implements Runnable, ChatClient
+public class Client implements Runnable, ChatClient, Serializable, Remote
 {
     public final int port;
     private ChatClient chatClient;
     private MessageListener listener;
     private ChatModelManager model;
+    private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
 
     public Client(int port, ChatModelManager modelManager) throws RemoteException

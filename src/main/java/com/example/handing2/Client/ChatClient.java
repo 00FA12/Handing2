@@ -15,8 +15,7 @@ public interface ChatClient extends Remote
  void send(String message) throws RemoteException;
  void addPropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException;
  void removePropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException;
- void firePropertyChange(String propertyName, ArrayList<Message> oldValue, ArrayList<Message> newValue)
-     throws RemoteException;
+ void firePropertyChange(String propertyName, ArrayList<Message> oldValue, ArrayList<Message> newValue) throws RemoteException;
  void close() throws RemoteException, IOException;
  boolean login(Login user) throws RemoteException, IOException;
  boolean register(Login user) throws RemoteException, IOException;
