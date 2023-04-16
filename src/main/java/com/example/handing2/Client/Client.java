@@ -3,32 +3,30 @@ package com.example.handing2.Client;
 import com.example.handing2.model.Chat;
 import com.example.handing2.model.ChatModelManager;
 import com.example.handing2.model.Login;
-import com.example.handing2.model.Message;
 import dk.via.remote.observer.RemotePropertyChangeListener;
+
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
-import java.io.Serializable;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
 
-
-public class Client implements Runnable, ChatClient, Serializable, Remote
+public class Client implements Runnable, ChatClient
 {
     public final int port;
     private ChatClient chatClient;
     private MessageListener listener;
     private ChatModelManager model;
-    private PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private Chat chat;
+
 
 
     public Client(int port, ChatModelManager modelManager) throws RemoteException
     {
         this.port = port;
         model = modelManager;
+        chat = Chat.getInstance();
     }
 
     @Override
@@ -60,17 +58,19 @@ public class Client implements Runnable, ChatClient, Serializable, Remote
         listener.send(message);
     }
 
-    @Override public void addPropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException
+    @Override public void addPropertyChangeListener(
+        RemotePropertyChangeListener<Chat> listener) throws RemoteException
     {
         chatClient.addPropertyChangeListener(listener);
     }
 
-    @Override public void removePropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException
+    @Override public void removePropertyChangeListener(
+        RemotePropertyChangeListener<Chat> listener) throws RemoteException
     {
         chatClient.removePropertyChangeListener(listener);
     }
 
-    @Override public void firePropertyChange(String propertyName, ArrayList<Message> oldValue, ArrayList<Message> newValue) throws RemoteException
+    @Override public void firePropertyChange(String propertyName, Chat oldValue, Chat newValue) throws RemoteException
     {
         chatClient.firePropertyChange(propertyName, oldValue, newValue);
     }
@@ -87,7 +87,8 @@ public class Client implements Runnable, ChatClient, Serializable, Remote
 
     @Override public boolean register(Login user) throws RemoteException, IOException
     {
-        return listener.register(user);
+        System.out.println(user);
+      return listener.register(user);
     }
 
     @Override public int getUserListSize() throws RemoteException, IOException

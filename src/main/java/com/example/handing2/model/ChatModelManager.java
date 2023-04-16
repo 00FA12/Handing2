@@ -8,62 +8,34 @@ import dk.via.remote.observer.RemotePropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class ChatModelManager implements ModelManager, Serializable
+public class ChatModelManager implements ModelManager
 {
   private Client server;
   private Chat chat;
   private Login login;
   private PropertyChangeSupport support;
-  private static ChatModelManager chatModelManager;
-  private ChatModelManager() throws IOException
+  public ChatModelManager() throws IOException
   {
     chat = Chat.getInstance();
     server = new Client(8080, this);
     server.run();
     support = new PropertyChangeSupport(this);
-    server.addPropertyChangeListener(event ->
-    {
-      if(event.getPropertyName().equals("list of messages"))
-      {
-        ArrayList<Message> messages = (ArrayList<Message>) event.getNewValue();
-        for (int i = 0; i < messages.size(); i++)
-        {
-          support.firePropertyChange("receive message", null, messages.get(i));
-        }
-      }
-      else
-      {
-        if (!((ArrayList<Message>) event.getNewValue()).get(event.getNewValue().size()).getLogin().equals(login))
-        {
-          support.firePropertyChange("receive message", null, event.getNewValue());
-        }
-      }
-    });
-  }
 
-  public static synchronized ChatModelManager getInstance() throws IOException
-  {
-    if (chatModelManager == null)
-    {
-      chatModelManager = new ChatModelManager();
-    }
-    return chatModelManager;
+
   }
   @Override public ArrayList<Message> getMessages()
   {
     return chat.getMessages();
   }
 
-  @Override public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) throws RemoteException
+  @Override public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener)
   {
     support.addPropertyChangeListener(propertyName, listener);
   }
-  @Override public void removePropertyChangeListener(String propertyName,
-      PropertyChangeListener listener) throws RemoteException
+  @Override public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener)
   {
     support.removePropertyChangeListener(propertyName, listener);
   }
