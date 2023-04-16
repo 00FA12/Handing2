@@ -17,4 +17,5 @@ public interface ModelManager
   int getUserListSize() throws IOException;
   void login(Login user) throws RemoteException;
   void sendUsers() throws IOException;
+  void updateOtherClientsUI(Chat chat);
 }

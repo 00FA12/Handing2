@@ -24,8 +24,8 @@ public class ChatModelManager implements ModelManager
     server.run();
     support = new PropertyChangeSupport(this);
 
-
   }
+
   @Override public ArrayList<Message> getMessages()
   {
     return chat.getMessages();
@@ -43,8 +43,16 @@ public class ChatModelManager implements ModelManager
   @Override public Message sendMessage(String message) throws RemoteException
   {
     server.send(message);
-    chat.addMessage(new Message(login, message));
+//    chat.addMessage(new Message(login, message));
     return chat.getMessages().get(chat.getMessages().size() - 1);
+  }
+
+  @Override public void updateOtherClientsUI(Chat chat)
+  {
+    this.chat = chat;
+    var lastMessage = chat.getMessages().get(chat.getMessages().size() - 1);
+    if(!lastMessage.getLogin().equals(login))
+      support.firePropertyChange("receive message", null, lastMessage);
   }
 
   @Override public void addUser(Login user) throws RemoteException, IOException
@@ -52,7 +60,7 @@ public class ChatModelManager implements ModelManager
     if(server.register(user))
     {
       chat.addUser(user);
-      login = user;
+      this.login = user;
     }
   }
 
