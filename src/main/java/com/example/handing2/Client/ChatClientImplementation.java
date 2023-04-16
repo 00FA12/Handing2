@@ -3,6 +3,7 @@ package com.example.handing2.Client;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.rmi.MarshalException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -19,7 +20,7 @@ import dk.via.remote.observer.RemotePropertyChangeSupport;
 
 public class ChatClientImplementation implements ChatClient {
 
-private final RemotePropertyChangeSupport<Chat> support;
+private final RemotePropertyChangeSupport<ArrayList<Message>> support;
 private final Chat chat;
 private static Login login;
 
@@ -34,7 +35,7 @@ private static Login login;
     if (chat.getUsers().contains(user))
     {
       login = user;
-      support.firePropertyChange("list of messages", null, chat);
+      support.firePropertyChange("list of messages", null, chat.getMessages());
       return true;
     }
     else
@@ -48,7 +49,7 @@ private static Login login;
     if (!chat.getUsers().contains(user))
     {
       login = user;
-      support.firePropertyChange("list of messages", null, chat);
+      support.firePropertyChange("list of messages", null, chat.getMessages());
       return true;
     }
     else throw new IOException("User has already been registered");
@@ -69,20 +70,20 @@ private static Login login;
   {
     Message message1 = new Message(login, message);
     chat.addMessage(message1);
-    support.firePropertyChange("new message", null, chat);
+    support.firePropertyChange("new message", null, chat.getMessages());
   }
 
-  @Override public void addPropertyChangeListener(RemotePropertyChangeListener<Chat> listener) throws RemoteException
+  @Override public void addPropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException
   {
     support.addPropertyChangeListener(listener);
   }
 
-  @Override public void removePropertyChangeListener(RemotePropertyChangeListener<Chat> listener) throws RemoteException
+  @Override public void removePropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException
   {
     support.removePropertyChangeListener(listener);
   }
 
-  @Override public void firePropertyChange(String propertyName, Chat oldValue, Chat newValue) throws RemoteException
+  @Override public void firePropertyChange(String propertyName, ArrayList<Message> oldValue, ArrayList<Message> newValue) throws RemoteException
   {
     support.firePropertyChange(propertyName, oldValue, newValue);
   }

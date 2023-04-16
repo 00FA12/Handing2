@@ -3,6 +3,7 @@ package com.example.handing2.Client;
 import com.example.handing2.model.Chat;
 import com.example.handing2.model.ChatModelManager;
 import com.example.handing2.model.Login;
+import com.example.handing2.model.Message;
 import dk.via.remote.observer.RemotePropertyChangeListener;
 
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+
 
 public class Client implements Runnable, ChatClient
 {
@@ -54,19 +57,17 @@ public class Client implements Runnable, ChatClient
         listener.send(message);
     }
 
-    @Override public void addPropertyChangeListener(
-        RemotePropertyChangeListener<Chat> listener) throws RemoteException
+    @Override public void addPropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException
     {
         chatClient.addPropertyChangeListener(listener);
     }
 
-    @Override public void removePropertyChangeListener(
-        RemotePropertyChangeListener<Chat> listener) throws RemoteException
+    @Override public void removePropertyChangeListener(RemotePropertyChangeListener<ArrayList<Message>> listener) throws RemoteException
     {
         chatClient.removePropertyChangeListener(listener);
     }
 
-    @Override public void firePropertyChange(String propertyName, Chat oldValue, Chat newValue) throws RemoteException
+    @Override public void firePropertyChange(String propertyName, ArrayList<Message> oldValue, ArrayList<Message> newValue) throws RemoteException
     {
         chatClient.firePropertyChange(propertyName, oldValue, newValue);
     }

@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -18,13 +17,14 @@ import java.rmi.RemoteException;
 
 public class ChatViewModel implements PropertyChangeListener
 {
-  private ModelManager model;
+  private final ModelManager model;
   private SimpleListProperty<Message> conversationList;
   private SimpleStringProperty currentMessage;
   private PropertyChangeSupport support;
   private ViewModelFactory viewModelFactory;
 
   public ChatViewModel(ModelManager model, ViewModelFactory viewModelFactory)
+      throws RemoteException
   {
     this.model = model;
     this.viewModelFactory = viewModelFactory;

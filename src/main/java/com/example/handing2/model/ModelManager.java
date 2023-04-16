@@ -8,8 +8,10 @@ import java.util.ArrayList;
 public interface ModelManager
 {
   ArrayList<Message> getMessages();
-  void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
-  void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
+  void addPropertyChangeListener(String propertyName, PropertyChangeListener listener)
+      throws RemoteException;
+  void removePropertyChangeListener(String propertyName, PropertyChangeListener listener)
+      throws RemoteException;
   Message sendMessage(String message) throws RemoteException;
   void addUser(Login user) throws IOException;
   int getUserListSize() throws IOException;

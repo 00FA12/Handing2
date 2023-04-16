@@ -8,6 +8,7 @@ import javafx.beans.property.StringProperty;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.rmi.RemoteException;
 
 public class InfoViewModel implements PropertyChangeListener
 {
@@ -17,6 +18,7 @@ public class InfoViewModel implements PropertyChangeListener
   private ViewModelFactory viewModelFactory;
 
   public InfoViewModel(ModelManager model, ViewModelFactory viewModelFactory)
+      throws RemoteException
   {
     this.model = model;
     this.viewModelFactory = viewModelFactory;

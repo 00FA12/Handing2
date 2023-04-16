@@ -17,27 +17,52 @@ public class ChatModelManager implements ModelManager
   private Chat chat;
   private Login login;
   private PropertyChangeSupport support;
-  public ChatModelManager() throws IOException
+  private static ChatModelManager chatModelManager;
+  private ChatModelManager() throws IOException
   {
     chat = Chat.getInstance();
     server = new Client(8080, this);
     server.run();
     support = new PropertyChangeSupport(this);
+    server.addPropertyChangeListener(event ->
+    {
+      if(event.getPropertyName().equals("list of messages"))
+      {
+        ArrayList<Message> messages = (ArrayList<Message>) event.getNewValue();
+        for (Message mes: messages)
+        {
+          support.firePropertyChange("receive message", null, mes);
+        }
+      }
+//      else
+//      {
+//        if (!((ArrayList<Message>) event.getNewValue()).ge)
+//        {
+//          support.firePropertyChange("receive message", null, event.getNewValue());
+//        }
+//      }
+    });
+  }
 
-
+  public static synchronized ChatModelManager getInstance() throws IOException
+  {
+    if (chatModelManager == null)
+    {
+      chatModelManager = new ChatModelManager();
+    }
+    return chatModelManager;
   }
   @Override public ArrayList<Message> getMessages()
   {
     return chat.getMessages();
   }
 
-  @Override public void addPropertyChangeListener(String propertyName,
-      PropertyChangeListener listener)
+  @Override public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) throws RemoteException
   {
     support.addPropertyChangeListener(propertyName, listener);
   }
   @Override public void removePropertyChangeListener(String propertyName,
-      PropertyChangeListener listener)
+      PropertyChangeListener listener) throws RemoteException
   {
     support.removePropertyChangeListener(propertyName, listener);
   }

@@ -14,7 +14,7 @@ public class StartClient2 extends Application
 {
   @Override public void start(Stage primaryStage) throws Exception
   {
-    ModelManager model = new ChatModelManager();
+    ModelManager model = ChatModelManager.getInstance();
     ViewModelFactory viewModelFactory = new ViewModelFactory(model);
     ViewHandler viewHandler = new ViewHandler(viewModelFactory);
     viewHandler.start(primaryStage);
